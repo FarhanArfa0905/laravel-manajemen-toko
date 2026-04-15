@@ -7,52 +7,83 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## POS & Manajemen Penyimpanan Barang Berbasis Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Sistem manajemen toko berbasis web yang dibangun menggunakan Laravel.
+Project ini mencakup pengelolaan produk, stok barang, serta transaksi penjualan (Point of Sale).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Authentication -> Login & Register (Breeze + Auth).
+- Manajemen Product (CRUD).
+- Barang Masuk (Page Penambahan Stok).
+- Barang Keluar (Page Stok Keluar).
+- Point of Sale (POS).
+- Checkout  & Sistem Transaksi.
+- Invoice.
+- History Transaksi
+- Catatan Barang Keluar
+- Dashboard / Laporan Keuangan (Total Profit, Produk Terlaris, Chart, Total Modal, Total Profit, Filter Per minggu)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+- Laravel 12.
+- TailWind.
+- Alpine Js.
+- MySql
+- Laravel Breeze
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Struktur Folder Project
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Product -> Manajemen Produk, (Create, Edit, Index, etc)
+- Stock-ins -> Manajemen Barang Masuk
+- Stock-outs -> Manajemen Barang Keluar
+- POS -> Sistem Transaksi
+- Dashboard -> Halaman Utama, Laporan Keuangan
 
-## Laravel Sponsors
+## Getting Started / Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clone Repository
+   git clone https://github.com/FarhanArfa0905/laravel-manajemen-toko.git
+   cd laravel-manajemen-toko
+2. Install Dependency (Yang Dibutuhkan)
+   composer Install
+   npm Install
+3. Setup Environment
+   cp .env.example .env
+   php artisan key:generate
+4. Setup .env
+5. Jalankan Migrasi
+   php artisan migrate
+6. Jalankan Server
+   npm run dev -> Wajib
+   php artisan serve (Misal menggunakan Laragon bisa langsung dibuka setelah start all)
 
-### Premium Partners
+## Business Logic / Logika Bisnis
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. Product -> digunakan untuk memasukkan barang baru, harga jual, harga modal, tidak termasuk jumlah stok.
+2. Stock-ins / Stock-outs -> Semua barang masuk dan barang keluar melalui page ini serta melalui POS
+3. Setiap transaksi menggunakan POS akan menghasilkan
+   - Pengurangan setiap produk
+   - Menghasilkan Invoice
+   - Menghasilkan Catatan Transaksi Penjualan
 
-## Contributing
+## Pengembangan Lebih Lanjut
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Pagination
+- Filter Kategori
+- Dashboard
+- Bug dan lain lain.
 
-## Code of Conduct
+## Screenshot
+1. Desktop
+(screenshots/desktop.png)
+2. Medium / Mobile
+(screenshots/mobile.png)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Author
+Muammar Farhan
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Note
+Project ini dibuat sebagai latihan sekaligus portofolio dalam membangun sebuah sistem POS berbasis Laravel.
 
 ## License
 
