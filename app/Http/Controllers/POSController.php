@@ -57,13 +57,10 @@ class POSController extends Controller
     public function remove(Request $request)
     {
         $cart = session()->get('cart', []);
-
         $cart = array_filter($cart, function ($item) use ($request) {
             return $item['product_id'] != $request->product_id;
         });
-
         session()->put('cart', $cart);
-
         return back();
     }
 
@@ -96,10 +93,6 @@ class POSController extends Controller
                 $price = $item['price'];
 
                 // ambil stock (FEFO)
-                // $stockIns = StockIn::where('product_id', $item['product_id'])
-                //     ->where('remaining_qty', '>', 0)
-                //     ->orderBy('expired_date', 'asc')
-                //     ->get();
                 $stockIns = StockIn::with('product') // 🔥 FIX
                     ->where('product_id', $item['product_id'])
                     ->where('remaining_qty', '>', 0)
