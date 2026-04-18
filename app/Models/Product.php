@@ -36,18 +36,19 @@ class Product extends Model
         ],
     ];
 
+    // Mass Assignment
     protected $fillable = [
         'name',
         'code',
         'type',
         'category',
+        'provider',
         'price',
         'cost_price',
-        'stock',
         'image',
-        'provider',
     ];
 
+    // Class Di dalam product / Helper
     public static function availableCategories(): array
     {
         return array_merge(
@@ -67,6 +68,29 @@ class Product extends Model
             ?? str($this->category)->replace('_', ' ')->title()->toString();
     }
 
+    public function getCurrentStockAttribute(): ?int
+    {
+        if($this->type !== self::TYPE_FISIK){
+            return null;
+        }
+
+        $totalStockIn = $this->stockIns->sum('qty');
+        $totalStockOut = $this->stockOuts->sum('qty');
+
+        return $totalStockIn - $totalStockOut;
+    }
+
+    public function getNearestExpiredDateAttribute(): ?string
+    {
+        if($this->type !== self::TYPE_FISIK){
+            return null;
+        }
+
+        $nearestExpired = $this->stockIns->whereNotNull('expired_date')->sortBy('expired_date')->first();
+        return $nearestExpired?->expired_date;
+    }
+
+    // Relasi Antar Table
     public function stockIns()
     {
         return $this->hasMany(StockIn::class);

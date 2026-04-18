@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->enum('type', ['fisik', 'digital'])->default('fisik');
             $table->string('category')->nullable();
-            $table->integer('stock')->nullable()->change();
             $table->integer('cost_price')->nullable()->change();
         });
     }
@@ -28,6 +27,10 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             //
+            $table -> dropColumn('code');
+            $table -> dropColumn('type');
+            $table -> dropColumn('category');
+            $table -> dropColumn('cost_price')->nullable(false)->change();
         });
     }
 };

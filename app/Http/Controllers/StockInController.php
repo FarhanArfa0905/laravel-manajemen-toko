@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\StockIn;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StockInController extends Controller
 {
@@ -15,7 +14,7 @@ class StockInController extends Controller
     public function index()
     {
         //
-        $stockIns = StockIn::with('product')->latest()->get();
+        $stockIns = StockIn::with('product')->latest()->paginate(5);
         return view('stock-ins.index', compact('stockIns'));
     }
 
@@ -25,7 +24,9 @@ class StockInController extends Controller
     public function create()
     {
         //
-        $products = Product::all();
+        // $products = Product::all();
+        // Ngambil Data Barang Fisik
+        $products = Product::where('type', Product::TYPE_FISIK)->get();
 
         return view('stock-ins.create', compact('products'));
     }
@@ -35,15 +36,20 @@ class StockInController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        // dd(DB::connection()->getDatabaseName());
         $request->validate([
             'product_id' => 'required|exists:products,id', 
             'qty' => 'required|integer|min:1',
-            'expired' => 'nullable|date',
+            'expired_date' => 'nullable|date',
+            'note' => 'nullable|string',
         ]);
 
         $product = Product::findOrFail($request->product_id);
+        // Validasi Backend Cuman Digital yang ada Data Stok
+        if ($product->type !== Product::TYPE_FISIK) {
+            return back()->withErrors([
+                'product_id' => 'Stok masuk hanya untuk produk fisik.'
+            ])->withInput();
+        }
 
         StockIn::create([
             'product_id' => $product->id,
@@ -52,9 +58,6 @@ class StockInController extends Controller
             'expired_date' => $request->expired_date,
             'note' => $request->note,
         ]);
-
-        $product->stock += $request->qty;
-        $product->save();
 
         return back()->with('success', 'Stok berhasil ditambahkan');
         }
@@ -90,4 +93,6 @@ class StockInController extends Controller
     {
         //
     }
+
+    // private function rules
 }

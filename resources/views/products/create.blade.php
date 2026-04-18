@@ -4,11 +4,17 @@
         Kembali
     </a>
     <div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
+        
         <h1 class="text-xl font-bold mb-4">Tambah Product</h1>
         <p class="text-sm text-gray-500 mb-5">
             Produk fisik cocok untuk stok barang seperti voucher, charger, atau kabel data.
             Produk digital cocok untuk pulsa, token listrik, transfer, dan layanan pembayaran.
         </p>
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded">
+                <p class="font-medium">Ada data yang belum valid.</p>
+            </div>
+        @endif
         <form action="/products" method="POST" enctype="multipart/form-data" id="productForm">
             @csrf
             <label class="block text-sm text-gray-600 mb-1">Nama Product</label>
@@ -40,6 +46,12 @@
             <select name="category" id="category" class="w-full border p-2 mb-1"></select>
             <p id="categoryHelp" class="text-xs text-gray-500 mb-2"></p>
             @error('category')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+
+            <label class="block text-sm  text-gray-600 mb-1 mt-3">Provider</label>
+            <input type="text" name="provider" class="w-full border p-2 mb-2" value="{{ old('provider') }}" placeholder="Contoh: Dana, BRI, Mitra-Bukalapak">
+            @error('provider')
                 <p class="text-red-500 text-sm">{{ $message }}</p>
             @enderror
 

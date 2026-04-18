@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             //
+            $table -> string('provider')->nullable()->after('category');
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             //
+            $table -> dropColumn('provider');
         });
     }
 };

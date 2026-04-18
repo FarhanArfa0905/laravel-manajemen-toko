@@ -44,6 +44,12 @@
                 <p class="text-red-500 text-sm">{{ $message }}</p>
             @enderror
 
+            <label class="block text-sm text-gray-600">Provider</label>
+            <input type="text" name="provider" placeholder="Contoh: Dana, BRI, Mitra Bukalapak" class="w-full border p2 mb-2" value="{{ old('provider', $product->provider) }}">
+            @error('provider')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+
             <label class="block text-sm text-gray-500 mb-1 mt-3">Harga Jual</label>
             <input id="price" type="number" name="price" value="{{ old('price', $product->price) }}" class="w-full border p-2 mb-2">
             @error('price')
