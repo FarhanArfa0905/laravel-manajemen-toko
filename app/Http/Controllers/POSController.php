@@ -13,24 +13,110 @@ use Illuminate\Support\Facades\DB;
 class POSController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         // session()->forget('cart');
-        $products = Product::all();
+        $query = Product::with(['stockIns', 'stockOuts']);
+
+        // Logika Filter
+        if($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        if($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        if($request->filled('provider')) {
+            $query->where('provider', $request->provider);
+        }
+        if($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search .'%');
+        }
+        $products = $query->orderBy('name')->get();
         $cart = session()->get('cart', []);
+
         // Nampilin Nama Item
         foreach ($cart as &$item) {
             $product = Product::find($item['product_id']);
             $item['name'] = $product->name;
         }
-        return view('pos.index', compact('products', 'cart'));
+
+        // $providers = Product::query()
+        //     ->whereNotNull('provider')
+        //     ->where('provider', '!=', '')
+        //     ->select('provider')
+        //     ->distinct()
+        //     ->orderBy('provider')
+        //     ->pluck('provider');
+
+        // Filter by Categories
+        $filteredCategories = [];
+        if ($request->filled('type')) {
+            $filteredCategories = Product::CATEGORY_OPTIONS[$request->type] ?? [];
+        }
+
+        $providerQuery = Product::query();
+
+        if ($request->filled('type')) {
+            $providerQuery->where('type', $request->type);
+        }
+
+        if ($request->filled('category')) {
+            $providerQuery->where('category', $request->category);
+        }
+
+        $providers = $providerQuery
+            ->whereNotNull('provider')
+            ->where('provider', '!=', '')
+            ->select('provider')
+            ->distinct()
+            ->orderBy('provider')
+            ->pluck('provider');
+
+
+
+        return view('pos.index', [
+            'products' => $products,
+            'cart' => $cart,
+            'providers' => $providers,
+            'filteredCategories' => $filteredCategories,
+            'selectedType' => $request->type,
+            'selectedCategory' => $request->category,
+            'selectedProvider' => $request->provider,
+            'search' => $request->search,
+            'typeLabels' => Product::TYPE_LABELS,
+            'categoryOptions' => Product::CATEGORY_OPTIONS,
+        ]);
     }
 
     public function add(Request $request)
     {
-        
-        $product = Product::find($request->product_id);
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'qty' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($request->product_id);
         $cart = session()->get('cart', []);
+
+        $currentCartQty = 0;
+
+        foreach ($cart as $item) {
+            if ($item['product_id'] == $product->id) {
+                $currentCartQty = $item['qty'];
+                break;
+            }
+        }
+
+        if ($product->type === Product::TYPE_FISIK) {
+            $requestedQty = $request->qty;
+            $availableStock = $product->current_stock ?? 0;
+            $totalQtyAfterAdd = $currentCartQty + $requestedQty;
+
+            if ($totalQtyAfterAdd > $availableStock) {
+                return back()->with('error', 'Stok fisik tidak cukup untuk ditambahkan ke cart.');
+            }
+        }
+
         $found = false;
 
         foreach ($cart as &$item) {
@@ -41,7 +127,7 @@ class POSController extends Controller
             }
         }
 
-        if (!$found) {
+        if (! $found) {
             $cart[] = [
                 'product_id' => $product->id,
                 'name' => $product->name,
@@ -51,8 +137,10 @@ class POSController extends Controller
         }
 
         session()->put('cart', $cart);
+
         return back();
     }
+
 
     public function remove(Request $request)
     {
@@ -87,38 +175,91 @@ class POSController extends Controller
             ]);
             $total = 0;
             // 2. Loop semua item di cart
+            // foreach ($cart as $item) {
+            //     $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($item['product_id']);
+            //     $cost = 0;
+            //     $qty = $item['qty'];
+            //     $price = $item['price'];
+
+            //     // ambil stock (FEFO)
+            //     $stockIns = StockIn::with('product') // 🔥 FIX
+            //         ->where('product_id', $item['product_id'])
+            //         ->where('remaining_qty', '>', 0)
+            //         ->orderBy('expired_date', 'asc')
+            //         ->get();
+            //     $cost = 0; // total modal
+            //     foreach ($stockIns as $stock) {
+            //         if ($qty <= 0) break;
+            //         if ($stock->remaining_qty >= $qty) {
+            //             $cost += $qty * ($stock->product->cost_price ?? 0);
+            //             $stock->remaining_qty -= $qty;
+            //             $stock->save();
+            //             $qty = 0;
+            //         } else {
+            //             $cost += $stock->remaining_qty * $stock->product->cost_price;
+            //             $qty -= $stock->remaining_qty;
+            //             $stock->remaining_qty = 0;
+            //             $stock->save();
+            //         }
+            //     }
+
+            //     $subtotal = $item['price'] * $item['qty'];
+            //     $profit = $subtotal - $cost;
+            //     $total += $subtotal;
+
+            //     // 3. Simpan detail transaksi
+            //     TransactionItem::create([
+            //         'transaction_id' => $transaction->id,
+            //         'product_id' => $item['product_id'],
+            //         'qty' => $item['qty'],
+            //         'selling_price' => $item['price'],
+            //         'cost_price' => $cost,
+            //         'profit' => $profit,
+            //     ]);
+            // }
             foreach ($cart as $item) {
+                $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($item['product_id']);
 
                 $qty = $item['qty'];
                 $price = $item['price'];
+                $cost = 0;
 
-                // ambil stock (FEFO)
-                $stockIns = StockIn::with('product') // 🔥 FIX
-                    ->where('product_id', $item['product_id'])
-                    ->where('remaining_qty', '>', 0)
-                    ->orderBy('expired_date', 'asc')
-                    ->get();
-                $cost = 0; // total modal
-                foreach ($stockIns as $stock) {
-                    if ($qty <= 0) break;
-                    if ($stock->remaining_qty >= $qty) {
-                        $cost += $qty * ($stock->product->cost_price ?? 0);
-                        $stock->remaining_qty -= $qty;
-                        $stock->save();
-                        $qty = 0;
-                    } else {
-                        $cost += $stock->remaining_qty * $stock->product->cost_price;
-                        $qty -= $stock->remaining_qty;
-                        $stock->remaining_qty = 0;
-                        $stock->save();
+                if ($product->type === Product::TYPE_FISIK) {
+                    $stockIns = StockIn::with('product')
+                        ->where('product_id', $item['product_id'])
+                        ->where('remaining_qty', '>', 0)
+                        ->orderBy('expired_date', 'asc')
+                        ->get();
+
+                    foreach ($stockIns as $stock) {
+                        if ($qty <= 0) {
+                            break;
+                        }
+
+                        if ($stock->remaining_qty >= $qty) {
+                            $cost += $qty * ($stock->product->cost_price ?? 0);
+                            $stock->remaining_qty -= $qty;
+                            $stock->save();
+                            $qty = 0;
+                        } else {
+                            $cost += $stock->remaining_qty * ($stock->product->cost_price ?? 0);
+                            $qty -= $stock->remaining_qty;
+                            $stock->remaining_qty = 0;
+                            $stock->save();
+                        }
                     }
+
+                    if ($qty > 0) {
+                        throw new \Exception('Stok fisik tidak cukup saat checkout.');
+                    }
+                } else {
+                    $cost = ($product->cost_price ?? 0) * $item['qty'];
                 }
 
                 $subtotal = $item['price'] * $item['qty'];
                 $profit = $subtotal - $cost;
                 $total += $subtotal;
 
-                // 3. Simpan detail transaksi
                 TransactionItem::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $item['product_id'],
@@ -141,7 +282,7 @@ class POSController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
+            return back()->with('error', $e->getMessage());
             // return back()->with('error', 'Terjadi error');
         }
     }

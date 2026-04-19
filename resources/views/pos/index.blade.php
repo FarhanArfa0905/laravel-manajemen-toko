@@ -1,26 +1,118 @@
 <x-app-layout>
     {{-- Back Button --}}
-    <a href="/products"
+    <a href="/dashboard"
     class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md transition mb-4 shadow border">
         ← Kembali
     </a>
     {{-- Content Input Harga --}}
     <div class="bg-white p-6 rounded shadow">
-        <h1 class="text-xl font-bold mb-4">Tambah Product</h1>
-        <form method="POST" action="/pos/add">
-            @csrf
-            <select name="product_id" class="w-full border p-2 mb-2">
-                @foreach ($products as $product)
-                    <option value="{{ $product->id }}">
-                        {{ $product->name }}
+        {{-- <h1 class="text-xl font-bold mb-4">Tambah Product</h1> --}}
+        <h1 class="text-xl font-bold mb-4">Filter Product</h1>
+        {{-- Form Filter --}}
+        <form method="GET" action="/pos" class="space-y-3">
+        <select name="type" class="w-full border p-2 rounded" id="type">
+            <option value="">Semua Tipe</option>
+            @foreach ($typeLabels as $value => $label)
+                <option value="{{ $value }}" {{ $selectedType == $value ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
+            @endforeach
+        </select>
+
+        <select name="category" class="w-full border p-2 rounded" id="category">
+            <option value="">Semua Kategori</option>
+                @foreach ($filteredCategories as $value => $label)
+                    <option value="{{ $value }}" {{ $selectedCategory == $value ? 'selected' : '' }}>
+                        {{ $label }}
                     </option>
                 @endforeach
-            </select>
-            <input type="number" name="qty" placeholder="Qty" class="w-full border p-2 mb-2">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded w-full">
-                Tambah
+        </select>
+
+        <select name="provider" class="w-full border p-2 rounded">
+            <option value="">Semua Provider</option>
+            @foreach ($providers as $provider)
+                <option value="{{ $provider }}" {{ $selectedProvider == $provider ? 'selected' : '' }}>
+                    {{ $provider }}
+                </option>
+            @endforeach
+        </select>
+
+        <input
+            type="text"
+            name="search"
+            value="{{ $search }}"
+            placeholder="Cari nama product"
+            class="w-full border p-2 rounded"
+        >
+
+        <div class="flex gap-2">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded">
+                Filter
             </button>
-        </form>
+            <a href="/pos" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">
+                Reset
+            </a>
+        </div>
+    </form>
+    {{-- Form Nambahkan Barang ke Cart --}}
+<div class="mt-6">
+    <h2 class="text-lg font-semibold mb-3">Hasil Product</h2>
+
+    <div class="space-y-3">
+        @forelse ($products as $product)
+            <div class="border rounded p-4 bg-gray-50">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    {{-- <div>
+                        <h3 class="font-semibold text-gray-800">{{ $product->name }}</h3>
+                        <p class="text-sm text-gray-600">
+                            {{ $product->type_label }} • {{ $product->category_label }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Provider: {{ $product->provider ?? '-' }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Harga: Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Stok: {{ $product->current_stock ?? '-' }}
+                        </p>
+                    </div> --}}
+                    <div>
+                        <h3 class="font-semibold text-gray-800">{{ $product->name }}</h3>
+                        <p class="text-sm text-gray-600">
+                            {{ $product->type_label }} • {{ $product->category_label }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Provider: {{ $product->provider ?? '-' }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Kode: {{ $product->code ?? '-' }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Harga: Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Stok: {{ $product->current_stock ?? '-' }}
+                        </p>
+                    </div>
+
+
+                    <form method="POST" action="/pos/add" class="flex items-center gap-2">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="number" name="qty" value="1" min="1" class="w-20 border rounded p-2">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded">
+                            Tambah
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-gray-500">Belum ada product yang cocok dengan filter.</p>
+        @endforelse
+    </div>
+</div>
+
     </div>
     {{-- Cart Catalog Penjualan--}}
     <div class="bg-white shadow rounded p-4">
@@ -127,4 +219,38 @@
             document.getElementById('checkoutForm').submit();
         }
     </script>
+
+    <script>
+        const categoryOptions = @json($categoryOptions);
+        const selectedType = @json($selectedType);
+        const selectedCategory = @json($selectedCategory);
+
+        const typeSelect = document.getElementById('type');
+        const categorySelect = document.getElementById('category');
+
+        function renderCategories(typeValue) {
+            const categories = categoryOptions[typeValue] || {};
+
+            categorySelect.innerHTML = '<option value="">Semua Kategori</option>';
+
+            Object.entries(categories).forEach(([value, label]) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+
+                if (selectedCategory === value) {
+                    option.selected = true;
+                }
+
+                categorySelect.appendChild(option);
+            });
+        }
+
+        typeSelect.addEventListener('change', function () {
+            renderCategories(this.value);
+        });
+
+        renderCategories(typeSelect.value);
+    </script>
+
 </x-app-layout>
