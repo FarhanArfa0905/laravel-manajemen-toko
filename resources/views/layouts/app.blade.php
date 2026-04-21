@@ -15,7 +15,19 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        @php
+            $sidebarMenus = [
+                ['label' => 'Laporan Keuangan', 'href' => '/dashboard', 'active' => request()->is('dashboard')],
+                ['label' => 'Products', 'href' => '/products', 'active' => request()->is('products*')],
+                ['label' => 'Stok Masuk', 'href' => '/stock-ins', 'active' => request()->is('stock-ins*')],
+                ['label' => 'Stok Keluar', 'href' => '/stock-outs', 'active' => request()->is('stock-outs*')],
+                ['label' => 'POS', 'href' => '/pos', 'active' => request()->is('pos*')],
+                ['label' => 'Riwayat Transaksi', 'href' => '/transactions', 'active' => request()->is('transactions*') && !request()->is('transactions/items*')],
+                ['label' => 'Detail Transaksi', 'href' => '/transactions/items', 'active' => request()->is('transactions/items*')],
+            ];
+        @endphp
+
+        <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -27,53 +39,62 @@
                 </header>
             @endisset
             
-            <div class="flex">
+            <div class="flex relative">
+            <!-- Mobile sidebar backdrop -->
+            <div
+                x-cloak
+                x-show="sidebarOpen"
+                x-transition.opacity
+                class="fixed inset-0 z-30 bg-gray-900/50 md:hidden"
+                @click="sidebarOpen = false"
+            ></div>
+
             <!-- SIDEBAR -->
-            <aside class="w-64 bg-white border-r min-h-screen p-4 hidden md:block">
+            <aside
+                class="block fixed inset-y-0 left-0 z-40 w-64 bg-white border-r min-h-screen p-4 transform transition-transform duration-300 ease-in-out md:static md:translate-x-0"
+                :class="{ 'translate-x-0 block': sidebarOpen, '-translate-x-full': !sidebarOpen }"
+                x-cloak
+            >
                 <h2 class="text-lg font-semibold mb-6">Menu</h2>
                 <nav class="space-y-2">
-                    <!-- Dashboard -->
-                    <a href="/dashboard"
-                       class="block px-3 py-2 rounded transition
-                       {{ request()->is('dashboard') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                        Laporan Keuangan
-                    </a>
-                    <!-- Products -->
-                    <a href="/products"
-                       class="block px-3 py-2 rounded transition
-                       {{ request()->is('products*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                        Products
-                    </a>
-                    <!-- Stock Ins Atau masuk -->
-                    <a href="/stock-ins"
-                        class="block px-3 py-2 rounded transition
-                        {{ request()->is('stock-ins*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                            Stok Masuk
-                    </a>
-                    <a href="/stock-outs"
-                        class="block px-3 py-2 rounded transition
-                        {{ request()->is('stock-outs*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                            Stok Keluar
-                    </a>
-                    <a href="/pos"
-                        class="block px-3 py-2 rounded transition
-                        {{ request()->is('pos*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                            POS
-                    </a>
-                    <a href="/transactions"
-                        class="block px-3 py-2 rounded transition
-                        {{ request()->is('transactions*') && !request()->is('transactions/items*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                            Riwayat Transaksi
-                    </a>                    
-                    <a href="/transactions/items"
-                        class="block px-3 py-2 rounded transition
-                        {{ request()->is('transactions/items*') ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                            Detail Transaksi
-                    </a>
+                    <div class="flex items-center justify-between md:hidden mb-4">
+                        <h2 class="text-lg font-semibold">Navigasi</h2>
+                        <button
+                            type="button"
+                            class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                            @click="sidebarOpen = false"
+                        >
+                            <span class="sr-only">Tutup sidebar</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    @foreach ($sidebarMenus as $menu)
+                        <a href="{{ $menu['href'] }}"
+                           class="block px-3 py-2 rounded transition {{ $menu['active'] ? 'bg-gray-200 font-semibold text-gray-900' : 'text-gray-700 hover:bg-gray-100' }}"
+                           @click="sidebarOpen = false">
+                            {{ $menu['label'] }}
+                        </a>
+                    @endforeach
                 </nav>
             </aside>
             <!-- Page Content -->
-            <main class="flex-1 p-6 bg-gray-50 min-h-screen flex flex-col">
+            <main class="flex-1 bg-gray-50 min-h-screen flex flex-col p-4 sm:p-6">
+                <div class="mb-4 md:hidden">
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50"
+                        @click="sidebarOpen = true"
+                    >
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        Menu
+                    </button>
+                </div>
+
                 <div class="flex-1">
                     {{ $slot }}
                 </div>
