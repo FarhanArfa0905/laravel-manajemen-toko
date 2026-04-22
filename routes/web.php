@@ -7,8 +7,14 @@ use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
 use Illuminate\Support\Facades\Route;
 
+
+// Landing Page
 Route::get('/', function () {
-    return view('welcome');
+    return view('landingpage.welcome');
+});
+
+Route::get('/kontak', function () {
+    return view('landingpage.kontak');
 });
 
 // Route::get('/dashboard', function () {
