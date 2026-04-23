@@ -9,12 +9,12 @@ use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return view ('products.index', [
             'title' => 'Products',
             'products' => Product::with(['stockIns', 'stockOuts'])->latest()->paginate(5),
-            // 'products' => Product::latest()->paginate(5)
+
         ]);
     }
 

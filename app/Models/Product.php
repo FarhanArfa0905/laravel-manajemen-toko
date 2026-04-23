@@ -74,10 +74,7 @@ class Product extends Model
             return null;
         }
 
-        $totalStockIn = $this->stockIns->sum('qty');
-        $totalStockOut = $this->stockOuts->sum('qty');
-
-        return $totalStockIn - $totalStockOut;
+        return $this->stockIns->sum('remaining_qty');
     }
 
     public function getNearestExpiredDateAttribute(): ?string
