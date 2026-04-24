@@ -64,6 +64,20 @@
                             <p id="categoryHelp" class="text-[10px] text-slate-400 mt-2 font-medium px-1"></p>
                         </div>
                     </div>
+
+                    {{-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> --}}
+                        <label class="block text-sm text-gray-600 mb-1 mt-3">Mode Nominal</label>
+                        <select name="is_flexible_amount" class="w-full border p-2 mb-2">
+                            <option value="0" {{ old('is_flexible_amount', (string) (int) $product->is_flexible_amount) == '0' ? 'selected' : '' }}>Fixed</option>
+                            <option value="1" {{ old('is_flexible_amount', (string) (int) $product->is_flexible_amount) == '1' ? 'selected' : '' }}>Flexible</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mb-2">
+                            Pilih Flexible untuk layanan dengan nominal transaksi yang diinput saat POS.
+                        </p>
+                        @error('is_flexible_amount')
+                            <p class="text-red-500 text-sm">{{ $message }}</p>
+                        @enderror
+                    {{-- </div> --}}
                 </div>
 
                 <hr class="border-slate-50">

@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/pos/clear', [POSController::class, 'clear']);
     Route::post('/pos/checkout', [POSController::class, 'checkout']);
     Route::get('/pos/invoice/{id}', [POSController::class, 'invoice']);
+    // Route::get('/transactions/items/export', [POSController::class, 'exportHistoryItems']);
 
     //Riwayat Transaksi
     Route::get('/transactions', [POSController::class, 'history']);

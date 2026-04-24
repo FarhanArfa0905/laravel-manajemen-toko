@@ -31,6 +31,13 @@ class POSController extends Controller
         if($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search .'%');
         }
+
+        // Filter by Categories
+        $filteredCategories = [];
+        if ($request->filled('type')) {
+            $filteredCategories = Product::CATEGORY_OPTIONS[$request->type] ?? [];
+        }
+
         $products = $query->orderBy('name')->get();
         $cart = session()->get('cart', []);
 
@@ -38,20 +45,6 @@ class POSController extends Controller
         foreach ($cart as &$item) {
             $product = Product::find($item['product_id']);
             $item['name'] = $product->name;
-        }
-
-        // $providers = Product::query()
-        //     ->whereNotNull('provider')
-        //     ->where('provider', '!=', '')
-        //     ->select('provider')
-        //     ->distinct()
-        //     ->orderBy('provider')
-        //     ->pluck('provider');
-
-        // Filter by Categories
-        $filteredCategories = [];
-        if ($request->filled('type')) {
-            $filteredCategories = Product::CATEGORY_OPTIONS[$request->type] ?? [];
         }
 
         $providerQuery = Product::query();
@@ -72,8 +65,6 @@ class POSController extends Controller
             ->orderBy('provider')
             ->pluck('provider');
 
-
-
         return view('pos.index', [
             'products' => $products,
             'cart' => $cart,
@@ -90,56 +81,87 @@ class POSController extends Controller
 
     public function add(Request $request)
     {
+    $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'qty' => 'nullable|integer|min:1',
+        'amount' => 'nullable|integer|min:1',
+    ]);
+
+    $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($request->product_id);
+    $cart = session()->get('cart', []);
+
+    if ($product->is_flexible_amount) {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'qty' => 'required|integer|min:1',
+            'amount' => 'required|integer|min:1',
         ]);
 
-        $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($request->product_id);
-        $cart = session()->get('cart', []);
+        $amount = (int) $request->amount;
+        $fee = $this->calculateFlexibleFee($amount);
+        $sellingPrice = $amount + $fee;
 
-        $currentCartQty = 0;
-
-        foreach ($cart as $item) {
-            if ($item['product_id'] == $product->id) {
-                $currentCartQty = $item['qty'];
-                break;
-            }
-        }
-
-        if ($product->type === Product::TYPE_FISIK) {
-            $requestedQty = $request->qty;
-            $availableStock = $product->current_stock ?? 0;
-            $totalQtyAfterAdd = $currentCartQty + $requestedQty;
-
-            if ($totalQtyAfterAdd > $availableStock) {
-                return back()->with('error', 'Stok fisik tidak cukup untuk ditambahkan ke cart.');
-            }
-        }
-
-        $found = false;
-
-        foreach ($cart as &$item) {
-            if ($item['product_id'] == $product->id) {
-                $item['qty'] += $request->qty;
-                $found = true;
-                break;
-            }
-        }
-
-        if (! $found) {
-            $cart[] = [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'qty' => $request->qty,
-            ];
-        }
+        $cart[] = [
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'price' => $sellingPrice,
+            'qty' => 1,
+            'amount' => $amount,
+            'fee' => $fee,
+            'is_flexible_amount' => true,
+        ];
 
         session()->put('cart', $cart);
 
         return back();
     }
+
+    $request->validate([
+        'qty' => 'required|integer|min:1',
+    ]);
+
+    $currentCartQty = 0;
+
+    foreach ($cart as $item) {
+        if ($item['product_id'] == $product->id) {
+            $currentCartQty = $item['qty'];
+            break;
+        }
+    }
+
+    if ($product->type === Product::TYPE_FISIK) {
+        $requestedQty = $request->qty;
+        $availableStock = $product->current_stock ?? 0;
+        $totalQtyAfterAdd = $currentCartQty + $requestedQty;
+
+        if ($totalQtyAfterAdd > $availableStock) {
+            return back()->with('error', 'Stok fisik tidak cukup untuk ditambahkan ke cart.');
+        }
+    }
+
+    $found = false;
+
+    foreach ($cart as &$item) {
+        if ($item['product_id'] == $product->id) {
+            $item['qty'] += $request->qty;
+            $found = true;
+            break;
+        }
+    }
+
+    if (! $found) {
+        $cart[] = [
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'qty' => $request->qty,
+            'is_flexible_amount' => false,
+        ];
+    }
+
+    session()->put('cart', $cart);
+
+    return back();
+}
+
 
 
     public function remove(Request $request)
@@ -219,12 +241,21 @@ class POSController extends Controller
             // }
             foreach ($cart as $item) {
                 $product = Product::with(['stockIns', 'stockOuts'])->findOrFail($item['product_id']);
-
                 $qty = $item['qty'];
                 $price = $item['price'];
                 $cost = 0;
+                $subtotal = 0;
+                $profit = 0;
+                $amount = $item['amount'] ?? null;
 
-                if ($product->type === Product::TYPE_FISIK) {
+                if ($product->is_flexible_amount) {
+                    $fee = $item['fee'] ?? 0;
+
+                    $cost = $amount ?? 0;
+                    $subtotal = $price;
+                    $profit = $fee;
+
+                } elseif ($product->type === Product::TYPE_FISIK) {
                     $stockIns = StockIn::with('product')
                         ->where('product_id', $item['product_id'])
                         ->where('remaining_qty', '>', 0)
@@ -252,19 +283,23 @@ class POSController extends Controller
                     if ($qty > 0) {
                         throw new \Exception('Stok fisik tidak cukup saat checkout.');
                     }
+
+                    $subtotal = $item['price'] * $item['qty'];
+                    $profit = $subtotal - $cost;
                 } else {
                     $cost = ($product->cost_price ?? 0) * $item['qty'];
+                    $subtotal = $item['price'] * $item['qty'];
+                    $profit = $subtotal - $cost;
                 }
 
-                $subtotal = $item['price'] * $item['qty'];
-                $profit = $subtotal - $cost;
                 $total += $subtotal;
 
                 TransactionItem::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $item['product_id'],
                     'qty' => $item['qty'],
-                    'selling_price' => $item['price'],
+                    'amount' => $amount,
+                    'selling_price' => $subtotal,
                     'cost_price' => $cost,
                     'profit' => $profit,
                 ]);
@@ -272,7 +307,7 @@ class POSController extends Controller
 
             // 4. Update total transaksi
             $transaction->update([
-                'total_price' => $total
+                'total_price' => $total,
             ]);
 
             // 5. Clear cart
@@ -296,7 +331,7 @@ class POSController extends Controller
     // History / Data penjualan
     public function history()
     {
-        $transactions = Transaction::latest()->get();
+        $transactions = Transaction::latest()->paginate(10);
         return view('pos.history', compact('transactions'));
     }
 
@@ -407,4 +442,10 @@ class POSController extends Controller
         $items = $query->latest()->paginate(10);
         return view('pos.detail', compact('items'));
     }
+
+    private function calculateFlexibleFee(int $amount): int
+    {
+        return ((int) floor($amount / 1000000) + 1) * 5000;
+    }
+
 }

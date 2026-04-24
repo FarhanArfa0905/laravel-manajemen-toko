@@ -8,7 +8,8 @@ class TransactionItem extends Model
 {
     //
     protected $fillable = [
-        'qty',   
+        'qty',
+        'amount',
         'selling_price',   
         'cost_price',   
         'profit',

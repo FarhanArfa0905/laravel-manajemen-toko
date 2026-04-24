@@ -43,6 +43,7 @@ class Product extends Model
         'type',
         'category',
         'provider',
+        'is_flexible_amount',
         'price',
         'cost_price',
         'image',

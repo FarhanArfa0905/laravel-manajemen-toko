@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col min-h-[85vh]">
         
-        <!-- Header & Action Section -->
+        {{-- Header & Action Section --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Daftar Produk</h1>
@@ -9,14 +9,6 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- Search Bar (Optional UI) -->
-                <div class="relative hidden sm:block">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </span>
-                    <input type="text" placeholder="Cari produk..." class="pl-10 pr-4 py-2.5 bg-white border-slate-200 rounded-xl text-sm focus:ring-indigo-500 focus:border-indigo-500 w-64 shadow-sm transition">
-                </div>
-
                 <a href="/products/create"
                    class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg shadow-indigo-100 group">
                     <svg class="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -24,6 +16,56 @@
                 </a>
             </div>
         </div>
+
+        {{-- Filter --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
+            <form method="GET" action="/products" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <select name="type" id="type" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
+                    <option value="">Semua Tipe</option>
+                    @foreach ($typeLabels as $value => $label)
+                        <option value="{{ $value }}" {{ $selectedType == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="category" id="category" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($filteredCategories as $value => $label)
+                        <option value="{{ $value }}" {{ $selectedCategory == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="provider" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
+                    <option value="">Semua Provider</option>
+                    @foreach ($providers as $provider)
+                        <option value="{{ $provider }}" {{ $selectedProvider == $provider ? 'selected' : '' }}>
+                            {{ $provider }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Cari nama produk..."
+                    class="w-full border border-slate-200 rounded-xl p-2.5 text-sm"
+                >
+
+                <div class="flex gap-2">
+                    <button class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition">
+                        Filter
+                    </button>
+                    <a href="/products" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-center transition">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
 
         {{-- Mobile Card View (Lebih Elegant) --}}
         <div class="md:hidden space-y-4">
@@ -53,7 +95,7 @@
                             <div class="mt-3">
                                 <p class="text-indigo-600 font-extrabold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-xs text-slate-500">Stok: <b>{{ $product->current_stock ?? '∞' }}</b></span>
+                                    <span class="text-xs text-slate-500">Stok: <b>{{ $product->current_stock ?? '-' }}</b></span>
                                     <span class="text-slate-200">|</span>
                                     <span class="text-xs text-slate-500">Kode: {{ $product->code ?? '-' }}</span>
                                 </div>
@@ -64,7 +106,13 @@
                     <div class="mt-5 pt-4 border-t border-slate-50 flex gap-2">
                         <a href="/products/{{ $product->id }}/edit" class="flex-1 bg-slate-100 hover:bg-amber-100 hover:text-amber-700 text-slate-600 font-bold py-2.5 rounded-xl text-xs text-center transition">Edit</a>
                         <a href="/products/{{ $product->id }}" class="flex-1 bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-600 font-bold py-2.5 rounded-xl text-xs text-center transition">Detail</a>
-                        <button type="button" onclick="confirmDelete({{ $product->id }})" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 rounded-xl text-xs transition">Hapus</button>
+                        <form id="delete-{{ $product->id }}" action="/products/{{ $product->id }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" onclick="confirmDelete({{ $product->id }})" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Hapus">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             @empty
@@ -119,7 +167,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <span class="inline-flex items-center px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-700">
-                                        {{ $product->current_stock ?? '∞' }}
+                                        {{ $product->current_stock ?? '-' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -136,9 +184,13 @@
                                         <a href="/products/{{ $product->id }}" class="p-2 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-lg transition" title="Detail">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         </a>
-                                        <button onclick="confirmDelete({{ $product->id }})" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Hapus">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
+                                        <form id="delete-{{ $product->id }}" action="/products/{{ $product->id }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" onclick="confirmDelete({{ $product->id }})" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Hapus">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -166,5 +218,36 @@
                 document.getElementById('delete-' + id).submit();
             }
         }
+
+        // Search atau Filter
+        const categoryOptions = @json($categoryOptions);
+        const selectedCategory = @json($selectedCategory);
+
+        const typeSelect = document.getElementById('type');
+        const categorySelect = document.getElementById('category');
+
+        function renderCategories(typeValue) {
+            const categories = categoryOptions[typeValue] || {};
+
+            categorySelect.innerHTML = '<option value="">Semua Kategori</option>';
+
+            Object.entries(categories).forEach(([value, label]) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+
+                if (selectedCategory === value) {
+                    option.selected = true;
+                }
+
+                categorySelect.appendChild(option);
+            });
+        }
+
+        typeSelect.addEventListener('change', function () {
+            renderCategories(this.value);
+        });
+
+        renderCategories(typeSelect.value);
     </script>
 </x-app-layout>

@@ -11,9 +11,58 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $query = Product::with(['stockIns', 'stockOuts']);
+
+        //Logika
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if($request->filled('provider')) {
+            $query->where('provider', $request->provider);
+        }
+
+        if($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $filteredCategories = [];
+        if ($request->filled('type')) {
+            $filteredCategories = Product::CATEGORY_OPTIONS[$request->type] ?? [];
+        }
+
+        $providerQuery = Product::query();
+        if ($request->filled('type')) {
+            $providerQuery->where('type', $request->type);
+        }
+
+        if ($request->filled('category')) {
+            $providerQuery->where('category', $request->category);
+        }
+
+        $providers = $providerQuery
+            ->whereNotNull('provider')
+            ->where('provider', '!=', '')
+            ->select('provider')
+            ->distinct()
+            ->orderBy('provider')
+            ->pluck('provider');
+
         return view ('products.index', [
             'title' => 'Products',
-            'products' => Product::with(['stockIns', 'stockOuts'])->latest()->paginate(5),
+            'products' => $query->latest()->paginate(10)->withQueryString(),
+            'providers' => $providers,
+            'filteredCategories' => $filteredCategories,
+            'selectedType' => $request->type,
+            'selectedCategory' => $request->category,
+            'selectedProvider' => $request->provider,
+            'search' => $request->search,
+            'typeLabels' => Product::TYPE_LABELS,
+            'categoryOptions' => Product::CATEGORY_OPTIONS,
 
         ]);
     }
@@ -46,10 +95,9 @@ class ProductController extends Controller
             'type' => $validated['type'],
             'category' => $validated['category'],
             'provider' => $validated['provider'] ?? null,
-            'price' => $validated['price'],
-            'cost_price' => $validated['type'] === Product::TYPE_FISIK
-                ? $validated['cost_price']
-                : ($validated['cost_price'] ?? null),
+            'is_flexible_amount' => (bool) $validated['is_flexible_amount'],
+            'price' => $validated['price'] ?? null,
+            'cost_price' => $validated['cost_price'] ?? null,
             'image' => $imagePath,
         ]);
 
@@ -89,10 +137,9 @@ class ProductController extends Controller
             'type' => $validated['type'],
             'category' => $validated['category'],
             'provider' => $validated['provider'] ?? null,
-            'price' => $validated['price'],
-            'cost_price' => $validated['type'] === Product::TYPE_FISIK
-                ? $validated['cost_price']
-                : ($validated['cost_price'] ?? null),
+            'is_flexible_amount' => (bool) $validated['is_flexible_amount'],
+            'price' => $validated['price'] ?? null,
+            'cost_price' => $validated['cost_price'] ?? null,
             'image' => $imagePath,
         ]);
 
@@ -131,9 +178,10 @@ class ProductController extends Controller
                 'required',
                 Rule::in(Product::availableCategories()),
             ],
+            'is_flexible_amount' => ['required', 'boolean'],
             'provider' => ['nullable', 'required_if:type,' . Product::TYPE_DIGITAL, 'string',  'max:100'],
-            'price' => ['required', 'integer', 'min:0'],
-            'cost_price' => ['nullable', 'required_if:type,' . Product::TYPE_FISIK, 'integer', 'min:0'],
+            'price' => ['nullable', 'required_if:is_flexible_amount,0', 'integer', 'min:0'],
+            'cost_price' => ['nullable', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
@@ -147,7 +195,7 @@ class ProductController extends Controller
             'type.in' => 'Tipe produk tidak valid.',
             'category.required' => 'Kategori produk wajib dipilih.',
             'category.in' => 'Kategori produk tidak valid.',
-            'price.required' => 'Harga jual wajib diisi.',
+            'price.required_if' => 'Harga jual wajib diisi untuk produk fixed.',
             'price.integer' => 'Harga jual harus berupa angka.',
             'price.min' => 'Harga jual tidak boleh minus.',
             'cost_price.required_if' => 'Harga modal wajib diisi untuk produk fisik.',
@@ -158,7 +206,10 @@ class ProductController extends Controller
             'image.mimes' => 'Format gambar harus JPG, JPEG, atau PNG.',
             'provider.required_if' => "Provider wajib diisi untuk produk digital",
             'provider.string' => 'Provider harus berupa teks',
-            'provider.max' => 'Provider maksimal 100 karakter'
+            'provider.max' => 'Provider maksimal 100 karakter',
+            'is_flexible_amount.required' => 'Mode nominal wajib dipilih.',
+            'is_flexible_amount.boolean' => 'Mode nominal tidak valid.',
+
         ];
     }
 
