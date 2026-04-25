@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto flex flex-col min-h-[85vh]">
         
-        <!-- Back Navigation -->
+        {{-- Button Kembali --}}
         <div class="mb-6">
             <a href="/stock-outs" class="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-rose-600 transition group">
                 <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,7 +12,7 @@
         </div>
 
         <div class="bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
-            <!-- Header Form -->
+            {{-- Form Header --}}
             <div class="p-8 md:p-10 border-b border-slate-50 bg-rose-50/30">
                 <div class="flex items-center gap-4 mb-2">
                     <div class="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center shadow-xl shadow-rose-200">
@@ -44,7 +44,7 @@
             <form action="/stock-outs" method="POST" class="p-8 md:p-10 space-y-8">
                 @csrf
 
-                <!-- Pilih Produk -->
+                {{-- Pilih Produk --}}
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 px-1">Pilih Produk Fisik</label>
                     <div class="relative group">
@@ -63,7 +63,7 @@
                     @error('product_id') <p class="text-rose-500 text-[10px] font-bold mt-2 px-1 uppercase">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Qty Keluar -->
+                {{-- Qty Keluar --}}
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 px-1">Jumlah Pengurangan (Qty)</label>
                     <div class="relative">
@@ -75,7 +75,7 @@
                     @error('qty') <p class="text-rose-500 text-[10px] font-bold mt-2 px-1 uppercase">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Note / Alasan -->
+                {{-- Alasan / Note --}}
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 px-1">Alasan Pengeluaran Stok</label>
                     <textarea name="note" rows="4" placeholder="Jelaskan alasan (Contoh: Layar pecah saat pengiriman, Kadaluarsa, Unit sampel pameran, dll)"

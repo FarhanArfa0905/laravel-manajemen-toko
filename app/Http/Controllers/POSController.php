@@ -443,6 +443,70 @@ class POSController extends Controller
         return view('pos.detail', compact('items'));
     }
 
+    public function exportHistoryItems(Request $request)
+    {
+        $query = TransactionItem::with(['product', 'transaction']);
+
+        if ($request->search) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->date) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $items = $query->latest()->get();
+
+        $filename = 'detail-transaksi-' . now()->format('Y-m-d-His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () use ($items) {
+            $file = fopen('php://output', 'w');
+
+            // BOM supaya Excel lebih aman baca UTF-8
+            fwrite($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($file, [
+                'Tanggal',
+                'Waktu',
+                'Produk',
+                'Tipe',
+                'Kategori',
+                'Qty',
+                'Nominal',
+                'Harga Jual',
+                'Harga Modal',
+                'Profit',
+            ]);
+
+            foreach ($items as $item) {
+                fputcsv($file, [
+                    $item->transaction->created_at->format('Y-m-d'),
+                    $item->transaction->created_at->format('H:i:s'),
+                    $item->product->name,
+                    $item->product->type_label ?? $item->product->type,
+                    $item->product->category_label ?? $item->product->category,
+                    $item->qty,
+                    $item->amount ?? '',
+                    $item->selling_price,
+                    $item->cost_price,
+                    $item->profit,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+
     private function calculateFlexibleFee(int $amount): int
     {
         return ((int) floor($amount / 1000000) + 1) * 5000;

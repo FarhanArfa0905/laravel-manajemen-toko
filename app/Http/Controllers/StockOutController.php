@@ -12,11 +12,30 @@ class StockOutController extends Controller
 {
     //
 
-    public function index()
+    public function index(Request $request)
     {
-        $stockOuts = StockOut::with('product')->latest()->paginate(10);
+    $query = StockOut::with('product');
 
-        return view('stock-outs.index', compact('stockOuts'));
+    if ($request->filled('category')) {
+        $query->whereHas('product', function ($q) use ($request) {
+            $q->where('category', $request->category);
+        });
+    }
+
+    if ($request->filled('search')) {
+        $query->whereHas('product', function ($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $stockOuts = $query->latest()->paginate(10)->withQueryString();
+
+    return view('stock-outs.index', [
+        'stockOuts' => $stockOuts,
+        'categoryOptions' => Product::CATEGORY_OPTIONS[Product::TYPE_FISIK],
+        'selectedCategory' => $request->category,
+        'search' => $request->search,
+    ]);
     }
 
     public function create()

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col min-h-[85vh]">
         
-        <!-- Header Section -->
+        {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
                 <div class="flex items-center gap-3 mb-2">
@@ -13,14 +13,14 @@
                 <p class="text-slate-500 text-sm mt-1">Daftar seluruh aktivitas penjualan di Ayra Cell.</p>
             </div>
 
-            <!-- Filter Singkat (UI Only) -->
+            {{--  --}}
             <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002-2z"></path></svg>
                 <span>{{ date('F Y') }}</span>
             </div>
         </div>
 
-        {{-- Mobile View (Card Based) --}}
+        {{-- Mobile View  --}}
         <div class="md:hidden space-y-4">
             @forelse($transactions as $trx)
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 relative overflow-hidden group active:scale-[0.98] transition-transform">
@@ -51,7 +51,7 @@
             @endforelse
         </div>
 
-        {{-- Desktop View (Elegant Table) --}}
+        {{-- Desktop View --}}
         <div class="hidden md:block bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
             <table class="w-full text-left border-separate border-spacing-0">
                 <thead>
@@ -98,7 +98,7 @@
             </table>
         </div>
 
-        {{-- Pagination (Jika ada) --}}
+        {{-- Pagination --}}
         @if(method_exists($transactions, 'links'))
             <div class="mt-8">
                 {{ $transactions->links() }}

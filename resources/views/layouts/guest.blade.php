@@ -56,7 +56,7 @@
     </div>
 
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
-        <!-- Logo Ayra Cell -->
+        {{-- Logo Ayra Cell --}}
         <div class="mb-8">
             <a href="/" class="flex items-center space-x-2">
                 <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-200">

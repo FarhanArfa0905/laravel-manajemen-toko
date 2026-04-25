@@ -116,15 +116,6 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    
-                    <!-- Menu Tambahan Kasir -->
-                    {{-- <x-nav-link href="#" :active="request()->is('transaksi*')">
-                        {{ __('Transaksi Baru') }}
-                    </x-nav-link>
-
-                    <x-nav-link href="#" :active="request()->is('riwayat*')">
-                        {{ __('Riwayat') }}
-                    </x-nav-link> --}}
                 </div>
             </div>
 

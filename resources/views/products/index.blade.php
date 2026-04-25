@@ -1,13 +1,12 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col min-h-[85vh]">
-        
         {{-- Header & Action Section --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Daftar Produk</h1>
                 <p class="text-slate-500 text-sm mt-1">Kelola stok produk fisik dan layanan digital Ayra Cell.</p>
             </div>
-            
+            {{-- Button Tambah Produk --}}
             <div class="flex items-center gap-3">
                 <a href="/products/create"
                    class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg shadow-indigo-100 group">
@@ -16,7 +15,6 @@
                 </a>
             </div>
         </div>
-
         {{-- Filter --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
             <form method="GET" action="/products" class="grid grid-cols-1 md:grid-cols-5 gap-3">
@@ -28,7 +26,7 @@
                         </option>
                     @endforeach
                 </select>
-
+                {{-- By Category --}}
                 <select name="category" id="category" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
                     <option value="">Semua Kategori</option>
                     @foreach ($filteredCategories as $value => $label)
@@ -37,7 +35,7 @@
                         </option>
                     @endforeach
                 </select>
-
+                {{-- By Provider --}}
                 <select name="provider" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm">
                     <option value="">Semua Provider</option>
                     @foreach ($providers as $provider)
@@ -46,7 +44,7 @@
                         </option>
                     @endforeach
                 </select>
-
+                {{-- By Search --}}
                 <input
                     type="text"
                     name="search"
@@ -54,7 +52,6 @@
                     placeholder="Cari nama produk..."
                     class="w-full border border-slate-200 rounded-xl p-2.5 text-sm"
                 >
-
                 <div class="flex gap-2">
                     <button class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl transition">
                         Filter
@@ -67,18 +64,16 @@
         </div>
 
 
-        {{-- Mobile Card View (Lebih Elegant) --}}
+        {{-- Mobile Card View  --}}
         <div class="md:hidden space-y-4">
             @forelse ($products as $product)
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-5 relative overflow-hidden">
-                    <!-- Badge Type -->
                     <div class="absolute top-0 right-0">
                         <span class="text-[10px] font-bold px-4 py-1 rounded-bl-2xl uppercase tracking-wider
                             {{ $product->type === \App\Models\Product::TYPE_FISIK ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700' }}">
                             {{ $product->type_label ?? ucfirst($product->type) }}
                         </span>
                     </div>
-
                     <div class="flex gap-4">
                         <div class="w-20 h-20 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
                             @if($product->image)
@@ -87,7 +82,6 @@
                                 <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             @endif
                         </div>
-
                         <div class="flex-1 min-w-0 pr-10">
                             <h2 class="font-bold text-slate-800 text-lg truncate">{{ $product->name }}</h2>
                             <p class="text-xs text-slate-400 font-medium uppercase tracking-tight">{{ $product->category_label ?? $product->category }} • {{ $product->provider ?? '-' }}</p>
@@ -122,7 +116,7 @@
             @endforelse
         </div>
 
-        {{-- Desktop Table View (Clean & Condensed) --}}
+        {{-- Desktop Table View--}}
         <div class="hidden md:block bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left border-separate border-spacing-0">

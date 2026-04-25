@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col min-h-[90vh]">
         
-        <!-- Header Section -->
+        {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight italic uppercase">Stok Keluar Manual</h1>
@@ -18,6 +18,38 @@
                 Catat Stok Keluar
             </a>
         </div>
+        
+        {{-- Filter By Kategori --}}
+        <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 mb-6">
+            <form method="GET" action="/stock-outs" class="flex flex-col md:flex-row gap-3 md:items-center">
+                <select name="category" class="bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-600 focus:ring-rose-500/20 py-3 px-4">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($categoryOptions as $value => $label)
+                        <option value="{{ $value }}" {{ $selectedCategory == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <input type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Cari nama produk..."
+                    class="bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-600 focus:ring-rose-500/20 py-3 px-4 w-full">
+
+                <div class="flex gap-2">
+                    <button class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition shadow-lg shadow-rose-100">
+                        Filter
+                    </button>
+
+                    <a href="/stock-outs"
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
 
         {{-- Desktop View --}}
         <div class="hidden md:block bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
@@ -126,7 +158,7 @@
             @endforelse
         </div>
 
-        <!-- Pagination -->
+        {{-- Pagination --}}
         <div class="mt-8">
             {{ $stockOuts->links() }}
         </div>

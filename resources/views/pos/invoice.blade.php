@@ -1,13 +1,11 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto flex flex-col min-h-[85vh]">
-        
-        <!-- Header & Navigasi (Sembunyi saat Print) -->
+        {{-- Header --}}
         <div class="flex items-center justify-between mb-8 print:hidden">
             <a href="/pos" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Kembali ke Kasir
-            </a>
-            
+            </a> 
             <div class="flex gap-2">
                 <a href="/transactions" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-50 transition">Riwayat</a>
                 <button onclick="window.print()" class="inline-flex items-center px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition">
@@ -17,10 +15,10 @@
             </div>
         </div>
 
-        <!-- AREA INVOICE / STRUK -->
+       {{-- Cetaik Struk --}}
         <div class="bg-white shadow-2xl shadow-slate-200/50 rounded-[2.5rem] border border-slate-100 overflow-hidden print:shadow-none print:border-none print:rounded-none">
             
-            <!-- Branding Struk -->
+            {{--Branding Struk --}}
             <div class="p-10 text-center border-b border-dashed border-slate-200">
                 <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-100 print:shadow-none">
                     <span class="text-white font-black text-3xl">A</span>
@@ -36,7 +34,7 @@
                 <div>Tanggal: <span class="text-slate-800 ml-1">{{ $transaction->created_at->format('d/m/Y H:i') }}</span></div>
             </div>
 
-            <!-- List Item -->
+            {{-- List Item --}}
             <div class="p-10">
                 <table class="w-full text-left">
                     <thead>
@@ -59,7 +57,7 @@
                     </tbody>
                 </table>
 
-                <!-- Summary -->
+                {{-- Summary --}}
                 <div class="mt-10 pt-8 border-t-2 border-slate-800 border-dotted flex justify-between items-center">
                     <div class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Total Pembayaran</div>
                     <div class="text-3xl font-black text-indigo-600 tracking-tighter">
@@ -67,21 +65,21 @@
                     </div>
                 </div>
 
-                <!-- Footer Struk -->
+                {{-- Footer --}}
                 <div class="mt-16 text-center">
                     <p class="text-xs font-bold text-slate-800 italic uppercase tracking-widest mb-1 italic">Terima Kasih</p>
                     <p class="text-[10px] text-slate-400 font-medium">Struk ini adalah bukti pembayaran yang sah.<br>Ayra Cell - Cepat, Murah, & Aman.</p>
                 </div>
             </div>
 
-            <!-- Gunting Line (Visual Only) -->
+            {{-- Visual --}}
             <div class="h-4 bg-slate-50 border-t border-slate-100 flex items-center justify-center print:hidden">
                 <div class="w-full border-t border-dashed border-slate-300"></div>
             </div>
         </div>
     </div>
 
-    <!-- Script CSS Khusus Print -->
+    <!-- Script CSS -->
     <style>
         @media print {
             body { 

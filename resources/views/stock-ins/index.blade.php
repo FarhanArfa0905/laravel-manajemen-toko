@@ -1,19 +1,46 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col min-h-[85vh]">
-        
-        <!-- Header Section -->
+        {{-- Header Section --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Data Stok Masuk</h1>
                 <p class="text-slate-500 text-sm mt-1">Riwayat pengadaan stok barang fisik Ayra Cell.</p>
             </div>
-            
+            {{-- Button Tambah Stock --}}
             <a href="{{ route('stock-ins.create') }}"
                class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-lg shadow-indigo-100 group">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Tambah Stok
             </a>
         </div>
+        {{-- Filter By Kategori / Search --}}
+        <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 mb-6">
+            <form method="GET" action="/stock-ins" class="flex flex-col md:flex-row gap-3 md:items-center">
+                <select name="category" class="bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-600 focus:ring-indigo-500/20 py-3 px-4">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($categoryOptions as $value => $label)
+                        <option value="{{ $value }}" {{ $selectedCategory == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+                <input type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Cari nama produk..."
+                    class="bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-600 focus:ring-indigo-500/20 py-3 px-4 w-full">
+                <div class="flex gap-2">
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition shadow-lg shadow-indigo-100">
+                        Filter
+                    </button>
+                    <a href="/stock-ins"
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
 
         {{-- Mobile Card View --}}
         <div class="md:hidden space-y-4">
@@ -38,7 +65,6 @@
                             </span>
                         @endif
                     </div>
-
                     <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Qty / Sisa</p>
@@ -49,7 +75,6 @@
                             <p class="text-sm font-bold text-slate-700">{{ $item->expired_date ? \Carbon\Carbon::parse($item->expired_date)->format('d/m/y') : '-' }}</p>
                         </div>
                     </div>
-
                     <div class="mt-4 flex flex-col gap-1 text-[11px] text-slate-500">
                         <div class="flex justify-between font-medium italic">
                             <span>Note: {{ $item->note ?? '-' }}</span>
@@ -136,6 +161,7 @@
             </div>
         </div>
 
+        {{-- Pagination --}}
         <div class="mt-8">
             {{ $stockIns->links() }}
         </div>

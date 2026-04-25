@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto flex flex-col min-h-[85vh]">
         
-        <!-- Kembali Section -->
+        {{-- Back Button --}}
         <div class="mb-6">
             <a href="/products" class="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-indigo-600 transition group">
                 <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,7 +12,7 @@
         </div>
 
         <div class="bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
-            <!-- Header Form -->
+            {{-- Header --}}
             <div class="p-8 md:p-10 border-b border-slate-50 bg-slate-50/30">
                 <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Tambah Produk Baru</h1>
                 <p class="text-slate-500 text-sm mt-1">
@@ -31,7 +31,7 @@
             <form action="/products" method="POST" enctype="multipart/form-data" id="productForm" class="p-8 md:p-10 space-y-8">
                 @csrf
 
-                <!-- Section: Identitas Produk -->
+                {{-- Ident Produk --}}
                 <div class="space-y-6">
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 px-1">Nama Produk</label>
@@ -55,7 +55,7 @@
                     </div>
                 </div>
 
-                <!-- Section: Tipe & Kategori -->
+                {{-- Section Type & kategori --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 px-1">Tipe Produk</label>
@@ -74,7 +74,7 @@
 
                 <hr class="border-slate-50">
 
-                <!-- Section: Keuangan & Mode -->
+                {{-- Section Keuntungan --}}
                 <div class="bg-indigo-50/50 p-8 rounded-[2.5rem] border border-indigo-100/50 space-y-6">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-sm font-black text-indigo-400 uppercase tracking-[0.2em]">Harga & Konfigurasi</h2>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Section: Media -->
+                {{-- Media / Image --}}
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 px-1">Foto Produk (Opsional)</label>
                     <div class="flex items-center justify-center w-full">
@@ -132,7 +132,7 @@
         </div>
     </div>
 
-    <!-- Script Logika Dynamic Kamu -->
+    <!-- Script JS -->
     <script>
         const categoryOptions = @json($categoryOptions);
         const selectedCategory = @json(old('category'));

@@ -11,11 +11,28 @@ class StockInController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $stockIns = StockIn::with('product')->latest()->paginate(5);
-        return view('stock-ins.index', compact('stockIns'));
+    $query = StockIn::with('product');
+    if ($request->filled('category')) {
+        $query->whereHas('product', function ($q) use ($request) {
+            $q->where('category', $request->category);
+        });
+    }
+
+    if ($request->filled('search')) {
+        $query->whereHas('product', function ($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $stockIns = $query->latest()->paginate(5)->withQueryString();
+    return view('stock-ins.index', [
+        'stockIns' => $stockIns,
+        'categoryOptions' => Product::CATEGORY_OPTIONS[Product::TYPE_FISIK],
+        'selectedCategory' => $request->category,
+        'search' => $request->search,
+    ]);
     }
 
     /**

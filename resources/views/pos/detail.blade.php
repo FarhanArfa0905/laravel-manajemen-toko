@@ -17,7 +17,6 @@
             <form method="GET" class="flex flex-wrap items-center gap-3 bg-white p-2 rounded-[1.5rem] shadow-sm border border-slate-100">
                 <input type="date" name="date" value="{{ request('date') }}"
                     class="border-none bg-slate-50 rounded-xl text-xs font-bold text-slate-600 focus:ring-indigo-500">
-                
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -25,10 +24,13 @@
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk..."
                         class="pl-9 border-none bg-slate-50 rounded-xl text-xs font-bold text-slate-600 focus:ring-indigo-500 w-44">
                 </div>
-
                 <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-widest px-6 py-2.5 rounded-xl transition shadow-lg shadow-indigo-100">
                     Filter
                 </button>
+                <a href="{{ url('/transactions/items/export') . '?' . http_build_query(request()->only(['search', 'date'])) }}"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest px-6 py-2.5 rounded-xl transition shadow-lg shadow-emerald-100">
+                    Export CSV
+                </a>
             </form>
         </div>
 
@@ -47,7 +49,7 @@
                     <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                         <div>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Subtotal</p>
-                            <p class="text-sm font-bold text-slate-700 text-sm italic">Rp {{ number_format($item->selling_price * $item->qty) }}</p>
+                            <p class="text-sm font-bold text-slate-700 text-sm italic">Rp {{ number_format($item->selling_price) }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1 italic">Profit</p>
@@ -80,7 +82,17 @@
                                     <span class="text-[9px] text-slate-400 font-medium tracking-tighter">{{ $item->transaction->created_at->format('H:i') }} WIB</span>
                                 </div>
                             </td>
-                            <td class="px-8 py-4 font-bold text-slate-800">{{ $item->product->name }}</td>
+                            <td class="px-8 py-4">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-800">{{ $item->product->name }}</span>
+
+                                    @if(!is_null($item->amount))
+                                        <span class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mt-1">
+                                            Nominal: Rp {{ number_format($item->amount) }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-8 py-4 text-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">
                                     {{ $item->qty }}
@@ -90,7 +102,7 @@
                                 Rp {{ number_format($item->selling_price) }}
                             </td>
                             <td class="px-8 py-4 text-right whitespace-nowrap">
-                                <span class="text-sm font-bold text-slate-800 italic">Rp {{ number_format($item->selling_price * $item->qty) }}</span>
+                                <span class="text-sm font-bold text-slate-800 italic">Rp {{ number_format($item->selling_price) }}</span>
                             </td>
                             <td class="px-8 py-4 text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-2">

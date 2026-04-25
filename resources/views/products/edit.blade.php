@@ -1,7 +1,6 @@
 <x-app-layout>
-    <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto flex flex-col min-h-[85vh]">
-        
-        <!-- Kembali Section -->
+    <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto flex flex-col min-h-[85vh]">    
+        {{-- Button Kembali --}}
         <div class="mb-6">
             <a href="/products" class="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-indigo-600 transition group">
                 <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -10,9 +9,8 @@
                 Kembali ke Daftar Produk
             </a>
         </div>
-
         <div class="bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
-            <!-- Header Form -->
+            {{-- Header --}}
             <div class="p-8 md:p-10 border-b border-slate-50 bg-slate-50/30">
                 <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Edit Produk</h1>
                 <p class="text-slate-500 text-sm mt-1">
@@ -24,7 +22,7 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Section: Informasi Utama -->
+                {{-- Content --}}
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
@@ -47,7 +45,6 @@
                                 class="w-full px-5 py-4 bg-slate-50 border-slate-100 rounded-2xl focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm" placeholder="Telkomsel, PLN, BRI, dsb">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Tipe Produk</label>
@@ -57,15 +54,12 @@
                                 @endforeach
                             </select>
                         </div>
-
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Kategori</label>
                             <select name="category" id="category" class="w-full px-5 py-4 bg-slate-50 border-slate-100 rounded-2xl focus:ring-indigo-500/20 focus:border-indigo-500 transition shadow-sm appearance-none"></select>
                             <p id="categoryHelp" class="text-[10px] text-slate-400 mt-2 font-medium px-1"></p>
                         </div>
                     </div>
-
-                    {{-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> --}}
                         <label class="block text-sm text-gray-600 mb-1 mt-3">Mode Nominal</label>
                         <select name="is_flexible_amount" class="w-full border p-2 mb-2">
                             <option value="0" {{ old('is_flexible_amount', (string) (int) $product->is_flexible_amount) == '0' ? 'selected' : '' }}>Fixed</option>
@@ -77,15 +71,13 @@
                         @error('is_flexible_amount')
                             <p class="text-red-500 text-sm">{{ $message }}</p>
                         @enderror
-                    {{-- </div> --}}
                 </div>
 
                 <hr class="border-slate-50">
 
-                <!-- Section: Harga & Keuntungan -->
+                {{-- Section Harga & Keuntungan --}}
                 <div class="bg-indigo-50/50 p-8 rounded-[2rem] border border-indigo-100/50">
                     <h2 class="text-sm font-black text-indigo-400 uppercase tracking-[0.2em] mb-6">Pengaturan Harga & Margin</h2>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label id="costPriceLabel" class="block text-sm font-bold  mb-2 text-indigo-900">Harga Modal</label>
@@ -96,7 +88,6 @@
                             </div>
                             <p id="costPriceHelp" class="text-[10px] text-indigo-400 mt-2 font-medium px-1"></p>
                         </div>
-
                         <div>
                             <label class="block text-sm font-bold  mb-2 text-indigo-900">Harga Jual</label>
                             <div class="relative">
@@ -107,14 +98,14 @@
                         </div>
                     </div>
 
-                    <!-- Margin Preview Card -->
+                    {{-- Preview Margin --}}
                     <div id="marginCard" class="mt-6 p-4 rounded-2xl bg-white border border-indigo-100 flex items-center justify-between">
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-widest px-2">Estimasi Keuntungan</span>
                         <span id="marginText" class="text-lg font-black tracking-tight"></span>
                     </div>
                 </div>
 
-                <!-- Section: Media -->
+                {{-- Section Media / Image --}}
                 <div class="space-y-4">
                     <label class="block text-sm font-bold text-slate-700">Foto Produk</label>
                     <div class="flex items-center gap-6 p-6 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
@@ -143,7 +134,7 @@
         </div>
     </div>
 
-    <!-- Script JS Tetap Menggunakan Logika Kamu -->
+    <!-- Script JS -->
     <script>
     const categoryOptions = @json($categoryOptions);
     const selectedCategory = @json(old('category', $product->category));

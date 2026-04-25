@@ -1,19 +1,17 @@
 <x-app-layout>
     <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col min-h-[85vh]">
-        
-        <!-- Breadcrumb / Back Button -->
+        {{-- Button Kembali --}}
         <div class="mb-6">
             <a href="/products" class="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-indigo-600 transition">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Kembali ke Daftar Produk
             </a>
         </div>
-
         <div class="bg-white shadow-sm border border-slate-100 rounded-[2.5rem] overflow-hidden">
-            <!-- Bagian Atas: Info Utama -->
+            {{-- Info Utama --}}
             <div class="p-8 md:p-12 border-b border-slate-50">
                 <div class="flex flex-col md:flex-row gap-10">
-                    
+                
                     {{-- Image Section --}}
                     <div class="w-full md:w-64 shrink-0">
                         <div class="aspect-square bg-slate-50 rounded-[2rem] border border-slate-100 overflow-hidden flex items-center justify-center shadow-inner">
@@ -27,7 +25,6 @@
                             @endif
                         </div>
                     </div>
-
                     {{-- Text Info Section --}}
                     <div class="flex-1">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -74,7 +71,7 @@
                 </div>
             </div>
 
-            <!-- Bagian Bawah: Detail Batch Stok -->
+           {{-- Detail Batch Stock --}}
             <div class="p-8 md:p-12 bg-slate-50/50">
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-xl font-extrabold text-slate-800">Detail Batch Stok</h2>

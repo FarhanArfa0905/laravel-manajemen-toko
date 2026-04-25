@@ -1,94 +1,6 @@
-{{-- <x-app-layout> --}}
-    {{-- Filter --}}
-    {{-- <form method="GET" class="mb-6 flex gap-2">
-        <select name="range" class="border p-2 rounded">
-            <option value="today" {{ $range=='today'?'selected':'' }}>Hari Ini</option>
-            <option value="week" {{ $range=='week'?'selected':'' }}>Minggu Ini</option>
-            <option value="month" {{ $range=='month'?'selected':'' }}>Bulan Ini</option>
-        </select>
-        <button class="bg-blue-500 text-white px-4 rounded">
-            Filter
-        </button>
-    </form> --}}
-    {{-- Content Utama Dashboard Laporan Penjualan --}}
-    {{-- <div class="max-w-6xl mx-auto mt-10">
-        <h1 class="text-2xl font-bold mb-6">📊 Dashboard</h1> --}}
-        {{-- Card --}}
-        {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-
-            <div class="bg-white p-4 shadow rounded">
-                <p class="text-gray-500">Total Hari Ini</p>
-                <p class="text-2xl font-bold tracking-tight">
-                    Rp {{ number_format($totalRevenue) }}
-                </p>
-            </div>
-            <div class="bg-white p-4 shadow rounded">
-                <p class="text-gray-500">Profit Hari Ini</p>
-                <p class="text-2xl font-bold tracking-tight text-green-600">
-                    Rp {{ number_format($totalProfit) }}
-                </p>
-            </div>
-            <div class="bg-white p-4 shadow rounded">
-                <p class="text-gray-500">Jumlah Transaksi</p>
-                <p class="text-2xl font-bold tracking-tight">
-                    {{ $totalTransaction }}
-                </p>
-            </div>
-        </div> --}}
-
-        {{-- Produk Teratas Penjualan --}}
-        {{-- <div class="bg-white p-6 shadow rounded">
-            <h2 class="text-lg font-semibold mb-4"> Produk Terlaris</h2>
-            <table class="w-full border border-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-2 text-left">Produk</th>
-                        <th class="p-2 text-center">Terjual</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($topProducts as $item)
-                        <tr class="border-t">
-                            <td class="p-2">
-                                {{ $item->product->name ?? '-' }}
-                            </td>
-                            <td class="p-2 text-center">
-                                {{ $item->total }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div> --}}
-        {{-- Chart / Grafik Penjualan --}}
-        {{-- <div class="bg-white p-6 shadow rounded mt-6">
-            <h2 class="text-lg font-semibold mb-4">📊 Grafik Penjualan</h2>
-            <canvas id="salesChart"></canvas>
-        </div>
-    </div> --}}
-
-    {{-- Script JS --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    const ctx = document.getElementById('salesChart');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: @json($labels),
-            datasets: [{
-                label: 'Revenue',
-                data: @json($values),
-                borderWidth: 2,
-                tension: 0.3
-            }]
-        },
-    });
-    </script>
-</x-app-layout> --}}
-
 <x-app-layout>
     <div class="py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Header Section -->
+        {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Laporan Keuangan</h1>
@@ -110,7 +22,7 @@
 
         {{-- Statistik Cards --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <!-- Revenue Card -->
+            {{-- Card Pendapatan Masuk --}}
             <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5">
                 <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -121,7 +33,7 @@
                 </div>
             </div>
 
-            <!-- Profit Card -->
+            {{-- Card Keuntungan --}}
             <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5">
                 <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
@@ -132,7 +44,7 @@
                 </div>
             </div>
 
-            <!-- Transaction Card -->
+            {{-- Card Jumlah Transaksi --}}
             <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 sm:col-span-2 lg:col-span-1">
                 <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>

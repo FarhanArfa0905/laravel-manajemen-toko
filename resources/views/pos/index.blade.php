@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto flex flex-col min-h-[90vh]">
         
-        <!-- Top Navigation -->
+        {{-- Navigation --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex items-center gap-4">
                 <a href="/dashboard" class="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-slate-400 hover:text-indigo-600 transition group">
@@ -25,11 +25,9 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- KOLOM KIRI: Filter & Produk -->
+            {{-- Kolom Kiri --}}
             <div class="lg:col-span-7 xl:col-span-8 space-y-6">
-                
-                <!-- Filter Card -->
+                {{-- Card Filter --}}
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
                     <form method="GET" action="/pos" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         <div class="space-y-1">
@@ -69,7 +67,7 @@
                     </form>
                 </div>
 
-                <!-- Product Grid -->
+                {{-- Grid Produk --}}
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     @forelse ($products as $product)
                         <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 hover:border-indigo-200 transition-all duration-300 shadow-sm flex flex-col justify-between">
@@ -124,7 +122,7 @@
                 </div>
             </div>
 
-            <!-- KOLOM KANAN: Keranjang (Sticky) -->
+            {{-- Kolom Cart Kanan --}}
             <div class="lg:col-span-5 xl:col-span-4 sticky top-6">
                 <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden flex flex-col min-h-[700px] max-h-[85vh]">
                     <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
@@ -140,7 +138,7 @@
                         </form>
                     </div>
 
-                    <!-- Items List -->
+                    {{-- List Item --}}
                     <div class="flex-1 overflow-y-auto p-6 space-y-4">
                         @php $total = 0; @endphp
                         @forelse ($cart as $item)
@@ -185,7 +183,7 @@
                         @endforelse
                     </div>
 
-                    <!-- Footer Checkout -->
+                    {{-- Footer --}}
                     <div class="p-8 bg-slate-900">
                         <div class="flex justify-between items-center mb-8">
                             <div>
@@ -205,7 +203,7 @@
         </div>
     </div>
 
-    <!-- MODAL PEMBAYARAN -->
+    {{-- Modal --}}
     <div id="checkoutModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-[100] p-4 transition-all duration-300">
         <div class="bg-white rounded-[3.5rem] p-10 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
             <div class="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
